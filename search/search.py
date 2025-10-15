@@ -116,7 +116,59 @@ def depthFirstSearch(problem: SearchProblem):
 def breadthFirstSearch(problem: SearchProblem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+import util
+
+def breadthFirstSearch(problem):
+    """
+    Search the deepest nodes in the search tree first.
+
+    Your search algorithm needs to return a list of actions that reaches the
+    goal. Make sure to implement a graph search algorithm.
+
+    To get started, you might want to try some of these simple commands to
+    understand the search problem that is being passed in:
+
+    print("Start:", problem.getStartState())
+    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
+    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
+    """
+    
+    # Initialize the fringe (a FIFO queue) with the starting state and an empty path.
+    # The items in the queue will be tuples: (state, pathToState)
+    fringe = util.Queue()
+    fringe.push((problem.getStartState(), []))
+
+    # Initialize a set to keep track of visited states to prevent cycles
+    # and redundant expansions.
+    visited = set()
+
+    # Loop until there are no more nodes to explore.
+    while not fringe.isEmpty():
+        # Dequeue the oldest node from the front of the fringe.
+        currentState, actions = fringe.pop()
+
+        # If we have already visited this state, skip it.
+        if currentState in visited:
+            continue
+
+        # If this state is the goal, we have found a solution.
+        if problem.isGoalState(currentState):
+            return actions
+
+        # Mark the current state as visited.
+        visited.add(currentState)
+
+        # Get the successors of the current state.
+        for nextState, action, cost in problem.getSuccessors(currentState):
+            # If the successor state has not been visited, add it to the fringe.
+            if nextState not in visited:
+                # The new path is the old path plus the new action.
+                newActions = actions + [action]
+                # Enqueue the new node to the back of the fringe.
+                fringe.push((nextState, newActions))
+                
+    # If the fringe becomes empty and no solution was found, return an empty list.
+    return []
 
 def uniformCostSearch(problem: SearchProblem):
     """Search the node of least total cost first."""
