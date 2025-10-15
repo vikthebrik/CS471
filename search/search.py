@@ -114,11 +114,6 @@ def depthFirstSearch(problem: SearchProblem):
  
 
 def breadthFirstSearch(problem: SearchProblem):
-    """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-import util
-
-def breadthFirstSearch(problem):
     """
     Search the deepest nodes in the search tree first.
 
