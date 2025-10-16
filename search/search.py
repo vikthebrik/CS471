@@ -87,35 +87,41 @@ def depthFirstSearch(problem: SearchProblem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    from util import Stack
 
-    fringe = Stack()                                # Initialize fringe to manage states to expand
+    # Initialize fringe (a FIFO stack) with a starting state and empty path.
+    fringe = util.Stack()                           
     fringe.push((problem.getStartState(), []))      # (state, path_to_current_state) 
 
-    visited = set()                                 # Track visited states
+    # Initialize set to track visited states
+    visited = set()                                 
 
     while not fringe.isEmpty():
-        current_state, actions = fringe.pop()
+        currentState, actions = fringe.pop()
 
-        if current_state not in visited:            # Check if current state in visited
-            visited.add(current_state)
-        else:
+        # Check if current state in visited; avoid repeat visits & cycles
+        if currentState in visited:                
             continue
+        # Mark current state as visited
+        visited.add(currentState)                  
 
-        if problem.isGoalState(current_state):      # Return action path if goal state reached
+        # Return action path if goal state reached
+        if problem.isGoalState(currentState):      
             return actions
         
-        successors = problem.getSuccessors(current_state)
-        for child, action, cost in successors:                      # Process child nodes
+        # Process child nodes
+        successors = problem.getSuccessors(currentState)
+        for child, action, cost in successors:   
+            # If not yet visited, push child to fringe & update current action path                   
             if child not in visited:                                
-                fringe.push((child, actions + [action]))    # Push child to fringe & update current action path
+                fringe.push((child, actions + [action]))    
 
-    return []           # Return empty list if no solution
+    # Return empty list if no solution
+    return []           
  
 
 def breadthFirstSearch(problem: SearchProblem):
     """
-    Search the deepest nodes in the search tree first.
+    Search the shallowest nodes in the search tree first.
 
     Your search algorithm needs to return a list of actions that reaches the
     goal. Make sure to implement a graph search algorithm.
@@ -168,7 +174,45 @@ def breadthFirstSearch(problem: SearchProblem):
 def uniformCostSearch(problem: SearchProblem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    # Initialize fringe (a priority queue) with a start state, path, and path cost (g)
+    fringe = util.PriorityQueue()
+    fringe.push((problem.getStartState(), [], 0), 0)      # (state, path, g)
+
+    # Initialize a dict to keep track of visited states & lowest cost paths to each
+    visited = {}
+
+    # Loop until there are no more nodes to explore.
+    while not fringe.isEmpty():
+        # Pop the lowest cost node from the fringe.
+        currentState, actions, g = fringe.pop()
+
+        # If we have already expanded this state with cheaper g, skip it.
+        if g > visited.get(currentState, float('inf')):
+            continue
+
+        # If this state is the goal, we have found a solution.
+        if problem.isGoalState(currentState):
+            return actions
+        
+        # Record best cost seen for this state
+        visited[currentState] = g
+
+        # Get the successors of the current state.
+        for nextState, action, cost in problem.getSuccessors(currentState):
+            # The new g = the old g + the new action cost.
+            new_g = g + cost
+            # If the successor state has not been visited with cheaper g, add it to the fringe.
+            if new_g < visited.get(nextState, float('inf')):
+                # Push the new node to the fringe.
+                fringe.push((nextState, actions + [action], new_g), new_g)
+                
+    # If the fringe becomes empty and no solution was found, return an empty list.
+    return []
+
+
+
+
 
 def nullHeuristic(state, problem=None):
     """
