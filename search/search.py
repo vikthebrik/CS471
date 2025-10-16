@@ -18,6 +18,7 @@ Pacman agents (in searchAgents.py).
 """
 
 import util
+from util import Stack
 
 class SearchProblem:
     """
@@ -224,7 +225,60 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    import util
+
+def aStarSearch(problem, heuristic=nullHeuristic):
+    """
+    Search the node that has the lowest combined cost and heuristic first.
+    
+    This function implements the A* search algorithm. It uses a Priority Queue
+    for the fringe, where the priority is calculated as g(n) + h(n):
+    g(n) = The actual cost of the path from the start node to node n.
+    h(n) = The estimated cost from node n to the goal, provided by the heuristic.
+    """
+    
+    # The fringe is a Priority Queue storing tuples of:
+    # ((state, actions, cost), priority)
+    fringe = util.PriorityQueue()
+
+    # A set to store states that have already been expanded.
+    visited = set()
+
+    # Get the starting state and push it to the fringe.
+    # The initial cost g(n) is 0. The priority is 0 + h(start).
+    startState = problem.getStartState()
+    fringe.push((startState, [], 0), 0 + heuristic(startState, problem))
+
+    while not fringe.isEmpty():
+        # Pop the node with the lowest priority (lowest g(n) + h(n)).
+        currentState, actions, currentCost = fringe.pop()
+
+        # If we've already found a cheaper path to this state, skip it.
+        if currentState in visited:
+            continue
+        
+        # Mark the state as visited. In A*, the first time we visit a node,
+        # we have found the cheapest path to it.
+        visited.add(currentState)
+
+        # If we've reached the goal, return the actions to get here.
+        if problem.isGoalState(currentState):
+            return actions
+
+        # Expand the node by adding its successors to the fringe.
+        for nextState, action, stepCost in problem.getSuccessors(currentState):
+            if nextState not in visited:
+                # Calculate the new cost (g) to reach the successor.
+                newCost = currentCost + stepCost
+                # Calculate the new priority for the successor.
+                priority = newCost + heuristic(nextState, problem)
+                
+                # Push the successor onto the fringe with its new priority.
+                fringe.push((nextState, actions + [action], newCost), priority)
+
+    # Return an empty list if no solution is found.
+    return []
 
 
 # Abbreviations
