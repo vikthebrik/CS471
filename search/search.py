@@ -237,7 +237,6 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     g(n) = The actual cost of the path from the start node to node n.
     h(n) = The estimated cost from node n to the goal, provided by the heuristic.
     """
-    
     # The fringe is a Priority Queue storing tuples of:
     # ((state, actions, cost), priority)
     fringe = util.PriorityQueue()

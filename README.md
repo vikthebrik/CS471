@@ -1,104 +1,137 @@
-# CS 471: Introduction to Artificial Intelligence - Project 1 Task Plan
+# Project 1 — Search (Pacman)
 
-## Course & Project Overview
+**Course:** CS 471/571 — Introduction to Artificial Intelligence, Fall 2025  
+**Due:** **Wed, Oct 22 at 11:59 pm**
 
-* **Course:** CS 471/571: Introduction to Artificial Intelligence (Fall 2025)
-* **Instructor:** Thanh H. Nguyen
-* **Project 1:** Search in Pac-Man
-* **Objective:** This project involves applying graph search algorithms to help Pac-Man navigate mazes. You will implement uninformed search algorithms like Depth-First Search (DFS) and Breadth-First Search (BFS), as well as informed (heuristic) search algorithms like Uniform-Cost Search (UCS) and A* search.
-* **Due Date:** October 22nd, 2025
+## Overview
+In this project you’ll implement general search algorithms (DFS, BFS, UCS, A*) and design heuristics to guide Pacman through mazes and food-collection tasks. You’ll develop in `search.py` and `searchAgents.py`, then validate with the provided autograder.
 
 ---
 
-## High-Level Objective
+## Repository / File Breakdown
+**Files you will edit (and submit):**
+- `search.py` — core search algorithms (DFS, BFS, UCS, A*).
+- `searchAgents.py` — search-based agents, state representations, and heuristics.
 
-The goal is to implement several search algorithms that will solve different Pac-Man scenarios. The project is divided into four main questions, each requiring the implementation of a specific algorithm. A successful project will have a Pac-Man agent that can efficiently find paths, collect all dots, and find the cheapest path to collect dots.
+**Files you may read/use:**
+- `pacman.py` — runs games; defines `GameState`.
+- `game.py` — core game logic and helper types.
+- `util.py` — data structures (`Stack`, `Queue`, `PriorityQueue`).
 
-## Team Roles & Responsibilities
+**Supporting files (no edits needed):**
+- `graphicsDisplay.py`, `graphicsUtils.py`, `textDisplay.py`, `ghostAgents.py`, `keyboardAgents.py`, `layout.py`, `autograder.py`, `testParser.py`, `testClasses.py`, `searchTestClasses.py`, and `test_cases/`.
 
-* **Madeline L: Foundations & Uninformed Search**
-    * Focuses on setting up the project environment and implementing the fundamental data structures and the first two search algorithms (DFS and BFS). This role lays the groundwork for the entire project.
-* **Vikram T: Informed & Heuristic Search**
-    * Focuses on implementing the more complex, cost-based search algorithms (UCS and A*) and is responsible for designing the crucial heuristic for the A* search portion.
+**Submission:** Upload **only** `search.py` and `searchAgents.py` to Canvas (no zip). If you worked with a partner, list them.
 
----
-
-## Detailed Task Breakdown
-
-### **Part 0: Project Setup & Code Analysis (Both Partners)**
-
-* **Task:** Download the project source code and familiarize yourselves with the existing files.
-* **Key Files to Understand:**
-    * `pacman.py`: The main file that runs the Pac-Man game. You'll use this to test your algorithms.
-    * `search.py`: Where you will write all of your search algorithm implementations.
-    * `searchAgents.py`: Contains the `SearchAgent` class that connects your algorithms to the Pac-Man world.
-    * `game.py`: Defines the Pac-Man world logic (states, actions, etc.).
-* **Action Item:** Ensure both partners can run the baseline game by executing `python pacman.py` in the terminal. Discuss how the different files interact, particularly how an `action` returned from `search.py` is used in the game.
-
-### **Part 1: Uninformed Search**
-
-#### **Question 1: Depth-First Search (DFS) - Madeline L**.
-
-* **Objective:** Implement the DFS algorithm to find a path to a fixed dot in the maze.
-* **File to Edit:** `search.py`
-* **Function to Implement:** `depthFirstSearch`
-* **Data Structure:** You will need a **Stack** for the fringe. The project provides a `util.Stack` class you can use.
-* **Testing:** Run the following command to test your implementation:
-    ```bash
-    python pacman.py -l tinyMaze -p SearchAgent
-    ```
-* **Success Metric:** Pac-Man should successfully find the path in the `tinyMaze`.
-
-#### **Question 2: Breadth-First Search (BFS) - Vikram T.**
-
-* **Objective:** Implement the BFS algorithm. This is often used to find the shortest path in terms of the number of steps.
-* **File to Edit:** `search.py`
-* **Function to Implement:** `breadthFirstSearch`
-* **Data Structure:** You will need a **Queue** for the fringe. Use the provided `util.Queue`.
-* **Testing:** Run the following command:
-    ```bash
-    python pacman.py -l mediumMaze -p SearchAgent -a fn=bfs
-    ```
-* **Success Metric:** Pac-Man should find the optimal path in terms of path length.
-
-### **Part 2: Informed Search & Heuristics**
-
-#### **Question 3: Uniform-Cost Search (UCS) - Madeline L.**
-
-* **Objective:** Implement the UCS algorithm to find the least-cost path. This differs from BFS when action costs are not uniform.
-* **File to Edit:** `search.py`
-* **Function to Implement:** `uniformCostSearch`
-* **Data Structure:** You will need a **Priority Queue** for the fringe to handle path costs. Use `util.PriorityQueue`. The priority should be the cumulative cost of the path to a node.
-* **Testing:** Run the following commands:
-    ```bash
-    python pacman.py -l mediumMaze -p SearchAgent -a fn=ucs
-    python pacman.py -l mediumDottedMaze -p StayEastSearchAgent
-    ```
-* **Success Metric:** Pac-Man must find the path with the lowest total cost, which may not be the shortest in terms of steps.
-
-#### **Question 4: A\* Search & Heuristics** - Vikram T.
-
-* **Objective:** Implement the A\* search algorithm and design an effective heuristic.
-* **File to Edit:** `search.py`
-* **Functions to Implement:** `aStarSearch` and a non-trivial heuristic for the `FoodSearchProblem`.
-* **Data Structure:** You will again use a **Priority Queue**. The priority for A\* is the sum of the path cost and the heuristic value: $g(n) + h(n)$.
-* **Heuristic Design:** For the "eat all dots" problem (`FoodSearchProblem`), you will need to design an **admissible** and **consistent** heuristic. Think about what information you can use from the `SearchProblem` state to estimate the remaining cost. A good heuristic is crucial for performance.
-* **Testing:**
-    ```bash
-    python pacman.py -l bigMaze -z .5 -p SearchAgent -a fn=astar,heuristic=manhattanHeuristic
-    ```
-* **Success Metric:** A\* should find the goal dot by expanding far fewer nodes than BFS, especially in large mazes.
+**Academic Honesty:** Code will be compared across submissions; submit your own work.
 
 ---
 
-## Integration and Final Submission
+## Setup & Running
+- Play Pacman: `python pacman.py`  
+- Options/help: `python pacman.py -h`  
+- Run autograder for a question (examples): `python autograder.py -q q1` • `-q q2` • … • `-q q8`
 
-* **Code Merge:** After both partners have completed and tested their sections, merge the code into the final `search.py` file.
-* **Final Review (Both Partners):**
-    * Run all provided autograder tests to ensure all parts work together correctly.
-    * Review the code for clarity, comments, and adherence to the project guidelines.
-    * Make sure there are no hard-coded solutions and that your code is general enough for any maze layout.
-* **Submission:**
-    * Submit only the `search.py` and `searchAgents.py` files.
-    * If you worked in a pair, ensure both partners' names and student IDs are included in the header of the files.
-    * Follow the specific submission instructions provided on the course website or Canvas.
+---
+
+## Questions, Requirements, & Commands
+> Return **legal action lists** and use the provided `util.py` data structures. Graph-search versions should avoid revisiting explored states.
+
+### Q1 — Depth-First Search (3 pts)
+Implement `depthFirstSearch` in `search.py`.
+```
+python pacman.py -l tinyMaze -p SearchAgent
+python pacman.py -l mediumMaze -p SearchAgent
+python pacman.py -l bigMaze -z .5 -p SearchAgent
+```
+Autograder: `python autograder.py -q q1`
+
+### Q2 — Breadth-First Search (3 pts)
+Implement `breadthFirstSearch` in `search.py`.
+```
+python pacman.py -l mediumMaze -p SearchAgent -a fn=bfs
+python pacman.py -l bigMaze -p SearchAgent -a fn=bfs -z .5
+```
+Autograder: `python autograder.py -q q2`
+
+### Q3 — Uniform-Cost Search (3 pts)
+Implement `uniformCostSearch` in `search.py`.
+```
+python pacman.py -l mediumMaze -p SearchAgent -a fn=ucs
+python pacman.py -l mediumDottedMaze -p StayEastSearchAgent
+python pacman.py -l mediumScaryMaze -p StayWestSearchAgent
+```
+Autograder: `python autograder.py -q q3`
+
+### Q4 — A* Search (3 pts)
+Implement `aStarSearch` in `search.py`.
+```
+python pacman.py -l bigMaze -z .5 -p SearchAgent -a fn=astar,heuristic=manhattanHeuristic
+```
+Autograder: `python autograder.py -q q4`
+
+### Q5 — Corners Problem: Representation (3 pts)
+Implement `CornersProblem` in `searchAgents.py`.
+```
+python pacman.py -l tinyCorners -p SearchAgent -a fn=bfs,prob=CornersProblem
+python pacman.py -l mediumCorners -p SearchAgent -a fn=bfs,prob=CornersProblem
+```
+Autograder: `python autograder.py -q q5`
+
+### Q6 — Corners Heuristic (3 pts)
+Implement `cornersHeuristic` in `searchAgents.py`.
+```
+python pacman.py -l mediumCorners -p AStarCornersAgent -z 0.5
+```
+Autograder: `python autograder.py -q q6`
+
+### Q7 — Eating All the Dots Heuristic (4 pts, + up to 1 extra)
+Implement `foodHeuristic` in `searchAgents.py`.
+```
+python pacman.py -l testSearch -p AStarFoodSearchAgent
+python pacman.py -l trickySearch -p AStarFoodSearchAgent
+```
+Autograder: `python autograder.py -q q7`
+
+### Q8 — Suboptimal (Greedy) Closest-Dot (3 pts)
+Implement `findPathToClosestDot` in `searchAgents.py`.
+```
+python pacman.py -l bigSearch -p ClosestDotSearchAgent -z .5
+```
+Autograder: `python autograder.py -q q8`
+
+---
+
+## Work Split (Pair Programming)
+Assigning **odd**–numbered questions to **Madeline L.** and **even**–numbered to **Vikram T.**:
+
+| Question | Topic | Assigned To |
+|-----------|--------|--------------|
+| Q1 | Depth-First Search | **Madeline L.** |
+| Q2 | Breadth-First Search | **Vikram T.** |
+| Q3 | Uniform-Cost Search | **Madeline L.** |
+| Q4 | A* Search | **Vikram T.** |
+| Q5 | Corners Problem: Representation | **Madeline L.** |
+| Q6 | Corners Heuristic | **Vikram T.** |
+| Q7 | Eating All the Dots: Heuristic | **Madeline L.** |
+| Q8 | Suboptimal Search (Closest-Dot) | **Vikram T.** |
+
+**Collaboration plan:**  
+- Share utility helpers but keep algorithm/heuristic code authored by the assigned person.  
+- Cross-review each PR and run `autograder.py -q qi` before merging.
+
+---
+
+## Tips & Gotchas
+- Always return a **list of legal actions** from your search routines.  
+- Use **Stack**, **Queue**, and **PriorityQueue** from `util.py`.  
+- Implement **graph-search** (track explored states).  
+- Use `--frameTime 0` for speed; `-z .5` for zoom.
+
+---
+
+## How to Submit
+Upload `search.py` and `searchAgents.py` only to Canvas. Add partner info to the submission.
+
+## Credits
+Assignment adapted from the UC Berkeley Pacman projects.
