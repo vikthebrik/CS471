@@ -506,7 +506,49 @@ def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+    # Get the list of remaining food positions
+    foodList = foodGrid.asList()
+
+    # If no food is left, the cost is 0
+    if not foodList:
+        return 0
+
+    # --- Step 1: Pre-computation (One-Time Setup) ---
+    # Use heuristicInfo to cache maze distances between all food dots
+    if 'foodDistances' not in problem.heuristicInfo:
+        # Create a dictionary to store pairwise distances
+        foodDistCache = {}
+        for food1 in foodList:
+            for food2 in foodList:
+                # Avoid redundant calculations
+                if (food1, food2) not in foodDistCache:
+                    dist = mazeDistance(food1, food2, problem.startingGameState)
+                    foodDistCache[(food1, food2)] = dist
+                    foodDistCache[(food2, food1)] = dist # Distance is symmetric
+        problem.heuristicInfo['foodDistances'] = foodDistCache
+    
+    foodDistances = problem.heuristicInfo['foodDistances']
+
+    # --- Step 2: Find distance from Pacman to the farthest food dot ---
+    max_dist_from_pacman = 0
+    for food_pos in foodList:
+        dist = mazeDistance(position, food_pos, problem.startingGameState)
+        if dist > max_dist_from_pacman:
+            max_dist_from_pacman = dist
+
+    # --- Step 3: Find the maximum distance between any two remaining food dots ---
+    max_dist_between_food = 0
+    if len(foodList) > 1:
+        for i in range(len(foodList)):
+            for j in range(i + 1, len(foodList)):
+                dist = foodDistances[(foodList[i], foodList[j])]
+                if dist > max_dist_between_food:
+                    max_dist_between_food = dist
+
+    # --- Step 4: Return the max of the two values ---
+    return max(max_dist_from_pacman, max_dist_between_food)
+
+
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
