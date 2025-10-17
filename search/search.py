@@ -11,6 +11,11 @@
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
+# University of Oregon CS471: Intro to AI, Project 1
+# Fall 2025
+
+# Collaborators: Madeline Luu, Vikram Thirumaran
+
 
 """
 In search.py, you will implement generic search algorithms which are called by

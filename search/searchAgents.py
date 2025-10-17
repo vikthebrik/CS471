@@ -12,6 +12,11 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
+# University of Oregon CS471: Intro to AI, Project 1
+# Fall 2025
+
+# Collaborators: Madeline Luu, Vikram Thirumaran
+
 """
 This file contains all of the agents that can be selected to control Pacman.  To
 select an agent, use the '-p' option when running pacman.py.  Arguments can be
@@ -581,7 +586,7 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         x,y = state
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return (x, y) in self.food.asList()
 
 def mazeDistance(point1: Tuple[int, int], point2: Tuple[int, int], gameState: pacman.GameState) -> int:
     """
