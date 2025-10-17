@@ -513,7 +513,7 @@ def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
     if not foodList:
         return 0
 
-    # --- Step 1: Pre-computation (One-Time Setup) ---
+    #Step 1: Pre-computation (One-Time Setup)
     # Use heuristicInfo to cache maze distances between all food dots
     if 'foodDistances' not in problem.heuristicInfo:
         # Create a dictionary to store pairwise distances
@@ -529,14 +529,14 @@ def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
     
     foodDistances = problem.heuristicInfo['foodDistances']
 
-    # --- Step 2: Find distance from Pacman to the farthest food dot ---
+    #Step 2: Find distance from Pacman to the farthest food dot
     max_dist_from_pacman = 0
     for food_pos in foodList:
         dist = mazeDistance(position, food_pos, problem.startingGameState)
         if dist > max_dist_from_pacman:
             max_dist_from_pacman = dist
 
-    # --- Step 3: Find the maximum distance between any two remaining food dots ---
+    #Step 3: Find the maximum distance between any two remaining food dots
     max_dist_between_food = 0
     if len(foodList) > 1:
         for i in range(len(foodList)):
@@ -545,7 +545,7 @@ def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
                 if dist > max_dist_between_food:
                     max_dist_between_food = dist
 
-    # --- Step 4: Return the max of the two values ---
+    #Step 4: Return the max of the two values
     return max(max_dist_from_pacman, max_dist_between_food)
 
 
