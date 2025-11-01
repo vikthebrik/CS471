@@ -76,43 +76,69 @@ class ReflexAgent(Agent):
         
         "*** YOUR CODE HERE ***"
 
-        # Return high score if win state is achieved
-        if successorGameState.isWin():
-            return 9999999
-        
-        # Manhattan distance from successor states --> available food
+        # Capsules (power pellets)
+        currentCapsules = currentGameState.getCapsules()
+        newCapsules = successorGameState.getCapsules()
+
+        # Start from successor score (built-in rewards)
+        score = successorGameState.getScore()
+        #1) Food Incentive
+        # If we actually ate food, reward it strongly
+        if successorGameState.getNumFood() < currentGameState.getNumFood():
+            score += 100.0
+
+        # Otherwise, reward getting closer to *some* food
         foodList = newFood.asList()
-        foodDistance = [0]
-        for position in foodList:
-            foodDistance.append(util.manhattanDistance(newPos, position))
+        if foodList:
+            closestFoodDist = min(manhattanDistance(newPos, f) for f in foodList)
+            # Closer food ⇒ bigger bonus
+            score += 10.0 / closestFoodDist
 
-        # Manhattan distance from successor states -> each ghost
-        ghostPos = []
-        for ghost in newGhostStates:
-            ghostPos.append(ghost.getPosition())
+        # 2) GHOSTS (dangerous vs. scared)
+        # Track how close a *dangerous* ghost is — this matters for capsules
+        minDangerousGhostDist = float("inf")
 
-        ghostDistance = []
-        for position in ghostPos:
-            ghostDistance.append(util.manhattanDistance(newPos, position))
+        for ghost, scaredTime in zip(newGhostStates, newScaredTimes):
+            ghostPos = ghost.getPosition()
+            ghostDist = manhattanDistance(newPos, ghostPos)
 
-        # Manhattan distance from current state -> each ghost
-        ghostPosCurrent = []
-        for ghost in currentGameState.getGhostPositions():
-            ghostPosCurrent.append(ghost.getPosition())
+            if scaredTime > 0:
+                # Edible ghost: closer is better
+                score += 5.0 / max(ghostDist, 1)
+            else:
+                # Dangerous ghost
+                minDangerousGhostDist = min(minDangerousGhostDist, ghostDist)
+                if ghostDist <= 1:
+                    # Being right next to a live ghost is terrible
+                    score -= 500.0
+                else:
+                    # Mild penalty for being kind of close
+                    score -= 3.0 / ghostDist
 
-        ghostDistanceCurrent = []
-        for position in ghostPosCurrent:
-            ghostDistanceCurrent.append(util.manhattanDistance(newPos, position))
+        # 3) CAPSULE (POWER PELLET) LOGIC
+        # Case A: we actually ate a capsule with this move
+        if len(newCapsules) < len(currentCapsules):
+            # Stronger than food, because it *flips* the ghost situation
+            score += 150.0
 
+        # Case B: we did NOT eat one, but there are capsules left:
+        # if a dangerous ghost is near, prefer moving *toward* a capsule
+        elif newCapsules:
+            # distance from *new* position to the closest remaining capsule
+            closestCapsuleDist = min(manhattanDistance(newPos, c) for c in newCapsules)
 
-        # Calculate relative score
+            # If a live ghost is nearby (say within 3 steps), push hard toward capsule
+            if minDangerousGhostDist <= 3:
+                score += 80.0 / closestCapsuleDist
+            else:
+                # Otherwise, still slightly prefer being closer to capsules
+                score += 15.0 / closestCapsuleDist
 
-        # Penalty for stop time
+        # 4) Penalize Stopping
+        if action == Directions.STOP:
+            score -= 10.0
 
-        # Calculate evaluation score
-
-        return successorGameState.getScore()
-
+        return score
 def scoreEvaluationFunction(currentGameState: GameState):
     """
     This default evaluation function just returns the score of the state.
