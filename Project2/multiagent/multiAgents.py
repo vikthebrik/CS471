@@ -169,6 +169,7 @@ class MultiAgentSearchAgent(Agent):
         self.evaluationFunction = util.lookup(evalFn, globals())
         self.depth = int(depth)
 
+
 class MinimaxAgent(MultiAgentSearchAgent):
     """
     Your minimax agent (question 2)
@@ -198,7 +199,57 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        numAgents = gameState.getNumAgents()
+
+        def maxValue(state, depth):
+            # Terminal or depth limit: evaluate
+            if depth == self.depth or state.isWin() or state.isLose():
+                return self.evaluationFunction(state)
+
+            v = float('-inf')
+            actions = state.getLegalActions(0)
+            if not actions:
+                return self.evaluationFunction(state)
+
+            for a in actions:
+                succ = state.generateSuccessor(0, a)
+                v = max(v, minValue(succ, 1, depth))
+            return v
+
+        def minValue(state, agentIndex, depth):
+            # Terminal: evaluate
+            if state.isWin() or state.isLose():
+                return self.evaluationFunction(state)
+
+            v = float('inf')
+            actions = state.getLegalActions(agentIndex)
+            if not actions:
+                return self.evaluationFunction(state)
+
+            nextAgent = agentIndex + 1
+            for a in actions:
+                succ = state.generateSuccessor(agentIndex, a)
+                if nextAgent == numAgents:
+                    # Wraps back to Pacman: increment depth
+                    v = min(v, maxValue(succ, depth + 1))
+                else:
+                    v = min(v, minValue(succ, nextAgent, depth))
+            return v
+
+        # Root: choose argmax action for Pacman
+        bestVal = float('-inf')
+        bestActions = []
+        for a in gameState.getLegalActions(0):
+            succ = gameState.generateSuccessor(0, a)
+            val = minValue(succ, 1, 0)
+            if val > bestVal:
+                bestVal = val
+                bestActions = [a]
+            elif val == bestVal:
+                bestActions.append(a)
+
+        return random.choice(bestActions) if bestActions else Directions.STOP
+
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
