@@ -421,10 +421,64 @@ def betterEvaluationFunction(currentGameState: GameState):
     Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
     evaluation function (question 5).
 
-    DESCRIPTION: <write something here so we know what you did>
+    DESCRIPTION: This evaluation function combines Pacman’s current game score with features derived from food, 
+    ghost, and capsule positions to guide strategic movement. It rewards states where Pacman is closer to remaining
+    food and penalizes being near active ghosts, while encouraging safe distances when ghosts are dangerous. 
+    When ghosts are scared, the function reverses this behavior—favoring proximity to ghosts for bonus points and 
+    reducing the urgency of collecting power pellets.
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # --- Extract key state information ---
+    pacmanPos = currentGameState.getPacmanPosition()
+    foodGrid = currentGameState.getFood()
+    foodList = foodGrid.asList()
+    ghostStates = currentGameState.getGhostStates()
+    scaredTimes = [ghost.scaredTimer for ghost in ghostStates]
+    capsules = currentGameState.getCapsules()
+    numCapsules = len(capsules)
+
+    # --- Compute Manhattan distances to food ---
+    foodDistances = [0]
+    for foodPos in foodList:
+        foodDistances.append(manhattanDistance(pacmanPos, foodPos))
+
+    # --- Compute Manhattan distances to ghosts ---
+    ghostPositions = [ghost.getPosition() for ghost in ghostStates]
+    ghostDistances = [0]
+    for gpos in ghostPositions:
+        ghostDistances.append(manhattanDistance(pacmanPos, gpos))
+
+    # --- Compute supporting features ---
+    numberOfNoFoods = len(foodGrid.asList(False))   # empty food cells
+    totalScaredTime = sum(scaredTimes)
+    totalGhostDistance = sum(ghostDistances)
+
+    # Reciprocal of total food distance — closer food increases score
+    if sum(foodDistances) > 0:
+        reciprocalFoodDist = 1.0 / sum(foodDistances)
+    else:
+        reciprocalFoodDist = 0.0
+
+    # --- Base score combines game score and food features ---
+    score = 0
+    score += currentGameState.getScore()
+    score += reciprocalFoodDist
+    score += numberOfNoFoods
+
+    # --- Adjust behavior based on ghost state ---
+    if totalScaredTime > 0:
+        # When ghosts are scared, approach them and deprioritize capsules
+        score += totalScaredTime
+        score -= numCapsules
+        score -= totalGhostDistance
+    else:
+        # When ghosts are active, keep distance and value capsules
+        score += totalGhostDistance
+        score += numCapsules
+
+    return score
+
+
 
 # Abbreviation
 better = betterEvaluationFunction
