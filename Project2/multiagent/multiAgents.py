@@ -276,7 +276,87 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         legal moves.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        STOP_PENALTY = 10.0  # discourage Pacman from choosing STOP unless it’s clearly best
+
+        # Root: Pacman chooses the action with highest expected value
+        actions = gameState.getLegalActions(0)
+        bestAction = None
+        bestScore = float("-inf")
+
+        def maxLevel(state, depth):
+            """
+            Pacman (agent 0) node.
+            We maximize over Pacman's actions, but we also slightly penalize STOP
+            so the agent doesn't idle when moving is just as good.
+            """
+            nextDepth = depth + 1
+
+            # Terminal or depth limit
+            if state.isWin() or state.isLose() or nextDepth == self.depth:
+                return self.evaluationFunction(state)
+
+            value = float("-inf")
+            legal = state.getLegalActions(0)
+
+            for action in legal:
+                successor = state.generateSuccessor(0, action)
+                score = expectLevel(successor, nextDepth, 1)
+
+                # discourage stopping at deeper levels too
+                if action == Directions.STOP:
+                    score -= STOP_PENALTY
+
+                value = max(value, score)
+
+            return value
+
+        def expectLevel(state, depth, agentIndex):
+            """
+            Ghost nodes.
+            We assume ghosts act randomly, so we return the average
+            over all their legal actions (uniform distribution).
+            """
+            if state.isWin() or state.isLose():
+                return self.evaluationFunction(state)
+
+            legal = state.getLegalActions(agentIndex)
+            if not legal:
+                return 0.0
+
+            numAgents = state.getNumAgents()
+            total = 0.0
+
+            for action in legal:
+                successor = state.generateSuccessor(agentIndex, action)
+
+                if agentIndex == numAgents - 1:
+                    # last ghost → next is Pacman, depth+1 already handled in maxLevel
+                    val = maxLevel(successor, depth)
+                else:
+                    # more ghosts → stay at same depth, next ghost
+                    val = expectLevel(successor, depth, agentIndex + 1)
+
+                total += val
+
+            return total / float(len(legal))
+
+        for action in actions:
+            successor = gameState.generateSuccessor(0, action)
+            score = expectLevel(successor, 0, 1)
+
+            # discourage stopping at root
+            if action == Directions.STOP:
+                score -= STOP_PENALTY
+
+            if score > bestScore:
+                bestScore = score
+                bestAction = action
+
+        return bestAction
+                #util.raiseNotDefined()
+
+
+
 
 def betterEvaluationFunction(currentGameState: GameState):
     """
