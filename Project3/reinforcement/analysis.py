@@ -19,6 +19,11 @@
 # Set the given parameters to obtain the specified policies through
 # value iteration.
 
+"""
+University of Oregon CS 471 Fall 2025
+Implemented by Madeline Luu and Vikram Thirumaran
+"""
+
 def question2a():
     """
       Prefer the close exit (+1), risking the cliff (-10).

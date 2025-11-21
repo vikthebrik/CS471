@@ -25,6 +25,11 @@ import random,util,math
 import numpy as np
 import copy
 
+"""
+University of Oregon CS 471 Fall 2025
+Implemented by Madeline Luu and Vikram Thirumaran
+"""
+
 class QLearningAgent(ReinforcementAgent):
     """
       Q-Learning Agent
@@ -219,14 +224,35 @@ class ApproximateQAgent(PacmanQAgent):
           where * is the dotProduct operator
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # Get feature vector f(s,a)
+        features = self.featExtractor.getFeatures(state, action)
+
+        # Calculate dot product: w * f(s,a)
+        qVal = 0.0
+        for feature, value in features.items():
+            qVal += self.weights[feature] * value
+        
+        return qVal
 
     def update(self, state, action, nextState, reward: float):
         """
            Should update your weights based on transition
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # Calculate sample (R + gamma * max Q(s', a'))
+        maxNextQ = self.computeValueFromQValues(nextState)
+        sample = reward + self.discount * maxNextQ
+
+        # Calculate TD error
+        currentQ = self.getQValue(state, action)
+        difference = sample - currentQ
+
+        # Get features
+        features = self.featExtractor.getFeatures(state, action)
+
+        # Update weights for each feature
+        for feature, value in features.items():
+            self.weights[feature] += self.alpha * difference * value
 
     def final(self, state):
         """Called at the end of each game."""
